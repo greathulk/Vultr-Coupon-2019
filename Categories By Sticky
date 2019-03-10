@@ -1,0 +1,34 @@
+<?php get_header(); ?>
+
+<?php
+/**
+	Custom Query for Sticky Posts only
+	----------------------------------
+*/
+	$custom_taxterms = wp_get_object_terms( $post->ID, 'category', array('fields' => 'ids') );
+	$sticky = get_option( 'sticky_posts' );
+	
+$args = array(
+	//'post_type' => 'YOUR_CUSTOM_POST_TYPE',
+	'post_status' => 'publish',
+	'posts_per_page' => 5, // you may edit this number
+	'orderby' => 'rand',
+	'no_found_rows'  => true,
+	'post__in' => $sticky,
+	'post__not_in' => array ( $post->ID ),
+	'tax_query' => array(
+		array(
+			'taxonomy' => 'category',
+			'field' => 'id',
+			'terms' => $custom_taxterms
+		)
+	)
+);
+	
+	if ( !empty($sticky) ):
+		// has sticky posts
+		query_posts($args);
+	$stickyPosts = new WP_query();
+	$stickyPosts->query($args);
+		if ( $stickyPosts->have_posts() ):
+?>
